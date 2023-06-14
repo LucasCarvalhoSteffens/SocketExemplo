@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Scanner;
 
 public class GreetClient {
     private Socket clientSocket;
@@ -28,17 +29,36 @@ public class GreetClient {
             System.out.println("Erro ao fechar a conexão.");
         }
     }
-    public String sendMessage(String msg) throws IOException {
+    public void sendMessage(String msg) throws IOException {
         out.println(msg);       //manda a mensagem para o socket
-        return in.readLine();   // retorna a mensagem recebida do socket
+
     }
+    public String receiveMessage() throws IOException {
+        return in.readLine();  // retorna a mensagem recebida do socket
+    }
+
 
     public static void main(String[] args) {
         GreetClient client = new GreetClient();
         try{
             client.start("127.0.0.1", 12345);
-            String response = client.sendMessage("hello server");
-            System.out.println("Resposta do servidor: "+ response);
+            Scanner scanner = new Scanner(System.in);
+            String mensagem;
+            String response;
+            do {
+                System.out.println("Entre com uma mensagem (!quit para sair):");
+                mensagem = scanner.nextLine();
+                client.sendMessage(mensagem);
+                response = client.receiveMessage();
+                System.out.println("Resposta do servidor: " + response);
+            }while (!"!quit".equals(mensagem) && !"!quit".equals(response));
+                System.out.println("Desligando cliente...");
+
+           // System.out.println("Resposta do servidor: "+ response);
+           // response = client.sendMessage("ola");
+           // System.out.println("Resposta do servidor: "+ response);
+           // response = client.sendMessage("!quit");
+           // System.out.println("Resposta do servidor: "+ response);
         } catch (IOException ex){
             throw new RuntimeException(ex);
         } finally {
